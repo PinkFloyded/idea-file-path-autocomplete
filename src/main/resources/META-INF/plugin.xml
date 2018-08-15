@@ -10,6 +10,9 @@
     <depends>com.intellij.modules.lang</depends>
 
     <extensions defaultExtensionNs="com.intellij">
+        <completion.contributor language="any" implementationClass="com.pinkfloyded.SimpleCompletionContributor"/>
+        <completion.confidence language="any" implementationClass="com.pinkfloyded.FilePathCompletionConfidence"
+                               order="before javaSkipAutopopupInStrings"/>
     </extensions>
 
     <actions>
