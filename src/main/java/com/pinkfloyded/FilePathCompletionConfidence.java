@@ -10,7 +10,6 @@ public class FilePathCompletionConfidence extends CompletionConfidence {
     @NotNull
     @Override
     public ThreeState shouldSkipAutopopup(@NotNull PsiElement contextElement, @NotNull PsiFile psiFile, int offset) {
-
         return ThreeState.NO;
     }
 }

@@ -14,7 +14,7 @@ import static org.junit.Assert.assertThat;
 
 public class FilePathMatcherTest {
 
-    private static final File FIXTURE_PATH = new File("src/test/testfixture/");
+    private static final String FIXTURE_PATH = new File("src/test/testdata/").getAbsolutePath();
 
     @Test
     public void emptyListForNonMatchingPath() {
@@ -24,30 +24,48 @@ public class FilePathMatcherTest {
     @Test
     public void matchesForValidDirectory() {
         Path[] expectedPaths = {
-                Paths.get(new File(FIXTURE_PATH, "container/abc.txt").getAbsolutePath()),
-                Paths.get(new File(FIXTURE_PATH, "container/abcd.txt").getAbsolutePath()),
-                Paths.get(new File(FIXTURE_PATH, "container/jeep.txt").getAbsolutePath())
+                Paths.get(FIXTURE_PATH + "/container/abc.txt"),
+                Paths.get(FIXTURE_PATH + "/container/abcd.txt"),
+                Paths.get(FIXTURE_PATH + "/container/jeep.txt"),
         };
 
-        assertThat(match(new File(FIXTURE_PATH, "container").getAbsolutePath()).toArray(), is(expectedPaths));
+        assertThat(match(FIXTURE_PATH + "/container/").toArray(), is(expectedPaths));
     }
 
 
     @Test
     public void matchesPartiallyCompletedFiles() {
         Path[] expectedPaths = new Path[]{
-                Paths.get(new File(FIXTURE_PATH, "container/abc.txt").getAbsolutePath()),
-                Paths.get(new File(FIXTURE_PATH, "container/abcd.txt").getAbsolutePath())
+                Paths.get(FIXTURE_PATH + "/container/abc.txt"),
+                Paths.get(FIXTURE_PATH + "/container/abcd.txt")
         };
-        assertThat(match(new File(FIXTURE_PATH, "container/ab").getAbsolutePath()).toArray(), is(expectedPaths));
+
+        assertThat(match(FIXTURE_PATH + "/container/ab").toArray(), is(expectedPaths));
+    }
+
+    @Test
+    public void doesntMatchDirContentWithoutTrailingSlash() {
+        Path[] expectedPaths = {
+                Paths.get(FIXTURE_PATH + "/container"),
+        };
+
+
+        assertThat(match(FIXTURE_PATH + "/cont").toArray(), is(expectedPaths));
     }
 
     @Test
     public void getsFileBaseName() {
         assertThat(getBaseName("/var/data/test/testing.txt"), is("testing.txt"));
     }
+
     @Test
     public void getsDirBaseName() {
         assertThat(getBaseName("/var/data/test/testing"), is("testing"));
     }
+
+    @Test
+    public void emptyStringForNoBaseName() {
+        assertThat(getBaseName("/"), is(""));
+    }
+
 }

@@ -15,21 +15,23 @@ final class FilePathMatcher {
         List<Path> matches = new ArrayList<>();
 
         File file = new File(str);
-        File[] filesInDir = file.listFiles();
-        if (filesInDir != null) {
-            for (File f : filesInDir) {
-                matches.add(Paths.get(f.getAbsolutePath()));
-            }
-        }
-
-        if (file.getParent() != null) {
-            String basename = getBaseName(str);
-            File[] matchesInParent = new File(new File(str).getParent())
-                    .listFiles((dir, name) -> name.startsWith(basename) && !name.equals(basename));
-
-            if (matchesInParent != null) {
-                for (File f : matchesInParent) {
+        if (str.endsWith(File.separator)) {
+            File[] filesInDir = file.listFiles();
+            if (filesInDir != null) {
+                for (File f : filesInDir) {
                     matches.add(Paths.get(f.getAbsolutePath()));
+                }
+            }
+        } else {
+            if (file.getParent() != null) {
+                String basename = getBaseName(str);
+                File[] matchesInParent = new File(new File(str).getParent())
+                        .listFiles((dir, name) -> name.startsWith(basename) && !name.equals(basename));
+
+                if (matchesInParent != null) {
+                    for (File f : matchesInParent) {
+                        matches.add(Paths.get(f.getAbsolutePath()));
+                    }
                 }
             }
         }
@@ -38,6 +40,7 @@ final class FilePathMatcher {
     }
 
     static String getBaseName(String path) {
-        return Paths.get(path).getFileName().toString();
+        Path pathObj = Paths.get(path);
+        return pathObj.getFileName() == null ? "" : pathObj.getFileName().toString();
     }
 }
