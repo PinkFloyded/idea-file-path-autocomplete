@@ -13,8 +13,16 @@ public class FilePathCompletionTest extends LightPlatformCodeInsightFixtureTestC
         return TEST_DATA_PATH.getAbsolutePath();
     }
 
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        myFixture.copyDirectoryToProject("container", "./");
+        myFixture.copyDirectoryToProject("testing", "./");
+    }
+
     public void testForwardSlashTriggersCompletion() {
-        myFixture.copyDirectoryToProject("container", ".");
+
+        myFixture.configureByFile("FileTest.java");
 //        myFixture.type("/");
 //        myFixture.complete(CompletionType.BASIC, 1);
 //        List<String> completions = myFixture.getLookupElementStrings();

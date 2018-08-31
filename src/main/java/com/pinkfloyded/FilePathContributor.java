@@ -1,45 +1,42 @@
 package com.pinkfloyded;
 
-import com.intellij.codeInsight.completion.*;
+import com.intellij.codeInsight.completion.CompletionContributor;
+import com.intellij.codeInsight.completion.CompletionParameters;
+import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
-import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiLiteral;
-import com.intellij.util.ProcessingContext;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.regex.Pattern;
 
 
 public class FilePathContributor extends CompletionContributor {
 
-    public FilePathContributor() {
-        extend(CompletionType.BASIC,
-                PlatformPatterns.psiElement().inside(PlatformPatterns.psiElement(PsiLiteral.class)),
-                new CompletionProvider<CompletionParameters>() {
-                    public void addCompletions(@NotNull CompletionParameters parameters,
-                                               ProcessingContext context,
-                                               @NotNull CompletionResultSet resultSet) {
+    private static Pattern HOME_PATTERN = Pattern.compile("^~/");
 
-                        String rawLiteral = parameters.getPosition()
-                                .getText()
-                                .replaceAll("^\"(.*)\"$", "$1")
-                                .replace(CompletionInitializationContext.DUMMY_IDENTIFIER_TRIMMED, "");
+    @Override
+    public void fillCompletionVariants(@NotNull CompletionParameters parameters, @NotNull CompletionResultSet result) {
+        if (isAStringLiteral(parameters.getPosition())) {
+            if (parameters.getOriginalPosition() == null) return;
 
-                        String resolvedPath = rawLiteral.replaceAll("^~/",
-                                System.getProperty("user.home") + "/");
+            String rawLiteral = parameters.getOriginalPosition()
+                    .getText()
+                    .replace("\'", "")
+                    .replace("\"", "");
 
-                        FilePathMatcher.match(resolvedPath)
-                                .filter(path -> !isHiddenFile(path))
-                                .map(Path::toString)
-                                .map(pathStr -> rawLiteral.startsWith("~/") ?
-                                        pathStr.replace(System.getProperty("user.home"), "~") : pathStr)
-                                .forEach(path -> resultSet.withPrefixMatcher(rawLiteral)
-                                        .addElement(LookupElementBuilder.create(path)));
-                    }
-                }
-        );
+            String resolvedPath = HOME_PATTERN.matcher(rawLiteral)
+                    .replaceAll(System.getProperty("user.home") + "/");
+
+            FilePathMatcher.match(resolvedPath)
+                    .filter(path -> !isHiddenFile(path))
+                    .map(Path::toString)
+                    .map(pathStr -> rawLiteral.startsWith("~/") ?
+                            pathStr.replace(System.getProperty("user.home"), "~") : pathStr)
+                    .forEach(path -> result.withPrefixMatcher(rawLiteral)
+                            .addElement(LookupElementBuilder.create(path)));
+        }
     }
 
     private static boolean isHiddenFile(Path path) {
@@ -53,6 +50,9 @@ public class FilePathContributor extends CompletionContributor {
         return typeChar == File.separatorChar;
     }
 
-
+    private static boolean isAStringLiteral(PsiElement element) {
+        String text = element.getText();
+        return (text.startsWith("\"") && text.endsWith("\"")) || (text.startsWith("'") && text.endsWith("'"));
+    }
 }
 
