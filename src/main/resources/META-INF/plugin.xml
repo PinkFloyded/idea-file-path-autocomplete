@@ -4,7 +4,8 @@
     <vendor email="k.veneetreddy@gmail.com">PinkFloyded</vendor>
 
     <description><![CDATA[
-    Autocompletes file paths<br>
+    <p>Auto-completes file paths.</p>
+    <i> Currently only linux is supported. Windows support and more features are under development. </i>
     ]]></description>
 
     <depends>com.intellij.modules.lang</depends>

@@ -1,1 +1,3 @@
-# An intellij plugin to auto-complete file paths. Still WIP.
+Auto completes file paths.
+
+Currently only linux based paths are supported. Support for windows is on the way.
