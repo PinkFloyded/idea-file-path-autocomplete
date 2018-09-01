@@ -8,6 +8,7 @@ import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.regex.Pattern;
 
@@ -19,24 +20,28 @@ public class FilePathContributor extends CompletionContributor {
     @Override
     public void fillCompletionVariants(@NotNull CompletionParameters parameters, @NotNull CompletionResultSet result) {
         if (isAStringLiteral(parameters.getPosition())) {
-            if (parameters.getOriginalPosition() == null) return;
+            int caretPositionInString = parameters.getOffset() - parameters.getPosition().getTextOffset();
 
-            String rawLiteral = parameters.getOriginalPosition()
+            String rawLiteral = parameters.getPosition()
                     .getText()
-                    .replace("\'", "")
-                    .replace("\"", "");
+                    .substring(1, caretPositionInString);
+
 
             String resolvedPath = HOME_PATTERN.matcher(rawLiteral)
                     .replaceAll(System.getProperty("user.home") + "/");
 
             FilePathMatcher.match(resolvedPath)
                     .filter(path -> !isHiddenFile(path))
-                    .map(Path::toString)
-                    .map(pathStr -> rawLiteral.startsWith("~/") ?
+                    .map(FilePathContributor::mapToString)
+                    .map(pathStr -> resolvedPath.startsWith("~/") ?
                             pathStr.replace(System.getProperty("user.home"), "~") : pathStr)
                     .forEach(path -> result.withPrefixMatcher(rawLiteral)
                             .addElement(LookupElementBuilder.create(path)));
         }
+    }
+
+    private static String mapToString(Path path) {
+        return path.toString() + (Files.isDirectory(path) ? File.separatorChar : "");
     }
 
     private static boolean isHiddenFile(Path path) {
