@@ -14,7 +14,7 @@ import static org.junit.Assert.assertThat;
 
 public class FilePathMatcherTest {
 
-    private static final String FIXTURE_PATH = new File("src/test/testdata/").getAbsolutePath();
+    private static final String FIXTURE_PATH = new File("src/test/fixture/unit").getAbsolutePath();
 
     @Test
     public void emptyListForNonMatchingPath() {
@@ -41,6 +41,16 @@ public class FilePathMatcherTest {
         };
 
         assertThat(match(FIXTURE_PATH + "/container/ab").toArray(), is(expectedPaths));
+    }
+
+    @Test
+    public void matchesPartiallyCompletedDirectories() {
+        Path[] expectedPaths = new Path[]{
+                Paths.get(FIXTURE_PATH + "/cont"),
+                Paths.get(FIXTURE_PATH + "/container")
+        };
+
+        assertThat(match(FIXTURE_PATH + "/con").toArray(), is(expectedPaths));
     }
 
     @Test
