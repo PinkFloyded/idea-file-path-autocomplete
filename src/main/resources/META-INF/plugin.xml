@@ -4,15 +4,18 @@
     <vendor email="k.veneetreddy@gmail.com">PinkFloyded</vendor>
 
     <description><![CDATA[
-    Autocompletes file paths<br>
+    <p>Auto-completes file paths.</p>
+    <i> Currently only linux is supported. Windows support and more features are under development. </i>
     ]]></description>
 
     <depends>com.intellij.modules.lang</depends>
 
     <extensions defaultExtensionNs="com.intellij">
+        <completion.contributor language="any" implementationClass="com.pinkfloyded.FilePathContributor"/>
+        <completion.confidence language="any" implementationClass="com.pinkfloyded.FilePathCompletionConfidence"
+                               order="before javaSkipAutopopupInStrings"/>
     </extensions>
 
     <actions>
     </actions>
-</idea-plugin
->
+</idea-plugin>

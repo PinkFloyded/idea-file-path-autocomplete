@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'com.pinkfloyded.idea-file-path-autocomplete'
-version '0.0.0-pre-release'
+version '0.1.0'
 
 sourceCompatibility = 1.8
 
@@ -18,9 +18,11 @@ dependencies {
 
 intellij {
     version '2018.1.5'
+    updateSinceUntilBuild false
 }
 patchPluginXml {
     changeNotes """
-      Add change notes here.<br>
-      <em>most HTML tags may be used</em>"""
+1. Add completion for Linux based paths
+2. Add `~/` based completion
+    """
 }
