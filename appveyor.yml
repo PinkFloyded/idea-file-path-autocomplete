@@ -2,6 +2,9 @@ version: 1.0.{build}
 image:
 - Ubuntu
 - Previous Visual Studio 2017
+matrix:
+  allow_failures:
+  -Previous Visual Studio 2017
 build_script:
 - cmd: ./gradlew build
 test_script:
