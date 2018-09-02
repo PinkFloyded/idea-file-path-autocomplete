@@ -1,11 +1,11 @@
 version: 1.0.{build}
 image:
 - Previous Visual Studio 2017
-- Ubuntu1804
+- Ubuntu
 build_script:
-- sh: ./gradlew build
+- cmd: ./gradlew build
 test_script:
-- sh: ./gradlew test
+- cmd: ./gradlew test
 notifications:
 - provider: Email
   to:
