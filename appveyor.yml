@@ -1,0 +1,15 @@
+version: 1.0.{build}
+image:
+- Previous Visual Studio 2017
+- Ubuntu1804
+build_script:
+- sh: ./gradlew build
+test_script:
+- sh: ./gradlew test
+notifications:
+- provider: Email
+  to:
+  - k.veneetreddy@gmail.com
+  on_build_success: true
+  on_build_failure: true
+  on_build_status_changed: true

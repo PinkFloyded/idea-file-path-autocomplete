@@ -28,7 +28,7 @@ public class FilePathIntegrationTest extends CodeInsightFixtureTestCase {
 
     public void testCompletesFilePaths() throws IOException {
 
-        configureFromFile("TriggerAutoPopup.java", JavaFileType.INSTANCE, myFixture.getTempDirPath() + "/holder/");
+        configureFromFile("AutocompleteFixture.java", JavaFileType.INSTANCE, myFixture.getTempDirPath() + "/holder/");
 
         List<String> expectedPaths = Stream.of(
                 new File(myFixture.getTempDirPath(), "holder/abc.txt"),
