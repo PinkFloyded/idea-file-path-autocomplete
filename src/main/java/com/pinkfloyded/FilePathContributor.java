@@ -8,7 +8,6 @@ import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.regex.Pattern;
 
@@ -33,7 +32,7 @@ public class FilePathContributor extends CompletionContributor {
             FilePathMatcher.match(resolvedPath)
                     .filter(path -> !isHiddenFile(path))
                     .map(FilePathContributor::mapToString)
-                    .map(pathStr -> resolvedPath.startsWith("~/") ?
+                    .map(pathStr -> rawLiteral.startsWith("~/") ?
                             pathStr.replace(System.getProperty("user.home"), "~") : pathStr)
                     .forEach(path -> result.withPrefixMatcher(rawLiteral)
                             .addElement(LookupElementBuilder.create(path)));
@@ -41,7 +40,7 @@ public class FilePathContributor extends CompletionContributor {
     }
 
     private static String mapToString(Path path) {
-        return path.toString() + (Files.isDirectory(path) ? File.separatorChar : "");
+        return path.toString();
     }
 
     private static boolean isHiddenFile(Path path) {
