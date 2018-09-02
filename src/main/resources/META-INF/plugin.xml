@@ -8,6 +8,7 @@
     <i> Currently only linux is supported. Windows support and more features are under development. </i>
     ]]></description>
 
+    <idea-version since-build="143"/>
     <depends>com.intellij.modules.lang</depends>
 
     <extensions defaultExtensionNs="com.intellij">
