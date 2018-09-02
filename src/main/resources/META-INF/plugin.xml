@@ -12,7 +12,7 @@
     <depends>com.intellij.modules.lang</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <completion.contributor language="any" implementationClass="com.pinkfloyded.FilePathContributor"/>
+        <completion.contributor language="any" implementationClass="com.pinkfloyded.FilePathCompletionContributor"/>
         <completion.confidence language="any" implementationClass="com.pinkfloyded.FilePathCompletionConfidence"
                                order="before javaSkipAutopopupInStrings"/>
     </extensions>

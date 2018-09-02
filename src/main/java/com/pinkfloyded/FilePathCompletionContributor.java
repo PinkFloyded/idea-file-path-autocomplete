@@ -12,7 +12,7 @@ import java.nio.file.Path;
 import java.util.regex.Pattern;
 
 
-public class FilePathContributor extends CompletionContributor {
+public class FilePathCompletionContributor extends CompletionContributor {
 
     private static Pattern HOME_PATTERN = Pattern.compile("^~/");
 
@@ -31,7 +31,7 @@ public class FilePathContributor extends CompletionContributor {
 
             FilePathMatcher.match(resolvedPath)
                     .filter(path -> !isHiddenFile(path))
-                    .map(FilePathContributor::mapToString)
+                    .map(FilePathCompletionContributor::mapToString)
                     .map(pathStr -> rawLiteral.startsWith("~/") ?
                             pathStr.replace(System.getProperty("user.home"), "~") : pathStr)
                     .forEach(path -> result.withPrefixMatcher(rawLiteral)
