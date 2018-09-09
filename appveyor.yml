@@ -1,18 +1,21 @@
 version: 1.0.{build}
 image:
-- Ubuntu
 - Previous Visual Studio 2017
-matrix:
-  allow_failures:
-    - image: Previous Visual Studio 2017
+
+build:
+  verbosity: detailed
+
 build_script:
-- cmd: ./gradlew build
+  - gradlew.bat assemble --info --no-daemon
+
 test_script:
-- cmd: ./gradlew test
+  - gradlew.bat check --info --no-daemon
+
+cache:
+  - C:\Users\appveyor\.gradle
+
 notifications:
 - provider: Email
   to:
   - k.veneetreddy@gmail.com
-  on_build_success: true
   on_build_failure: true
-  on_build_status_changed: true

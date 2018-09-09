@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 
 import static com.pinkfloyded.FilePathMatcher.getBaseName;
 import static com.pinkfloyded.FilePathMatcher.match;
+import static org.fest.assertions.Fail.fail;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -29,6 +30,7 @@ public class FilePathMatcherTest {
                 Paths.get(FIXTURE_PATH + "/container/jeep.txt"),
         };
 
+        fail();
         assertThat(match(FIXTURE_PATH + "/container/").toArray(), is(expectedPaths));
     }
 
