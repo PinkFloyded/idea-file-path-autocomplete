@@ -4,3 +4,7 @@ sudo: false
 script:
 - ./gradlew build
 - ./gradlew test
+
+branches:
+  only:
+  - ci_setup
