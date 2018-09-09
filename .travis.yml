@@ -1,0 +1,6 @@
+language: java
+sudo: false
+
+script:
+- ./gradlew build
+- ./gradlew test
