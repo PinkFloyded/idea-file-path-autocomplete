@@ -29,7 +29,7 @@ public class FilePathMatcherTest {
                 Paths.get(FIXTURE_PATH + "/container/jeep.txt"),
         };
 
-        assertThat(match(FIXTURE_PATH + "/container/").toArray(), is(expectedPaths));
+        assertThat(match(FIXTURE_PATH + "/container" + File.separatorChar).toArray(), is(expectedPaths));
     }
 
 
