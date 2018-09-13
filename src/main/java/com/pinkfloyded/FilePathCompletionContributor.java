@@ -4,6 +4,7 @@ import com.intellij.codeInsight.completion.CompletionContributor;
 import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
+import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 
@@ -15,6 +16,7 @@ import java.util.regex.Pattern;
 public class FilePathCompletionContributor extends CompletionContributor {
 
     private static Pattern HOME_PATTERN = Pattern.compile("^~/");
+    private static Pattern CURRENT_DIR_PATTERN = Pattern.compile("^[.]/");
 
     @Override
     public void fillCompletionVariants(@NotNull CompletionParameters parameters, @NotNull CompletionResultSet result) {
@@ -29,11 +31,15 @@ public class FilePathCompletionContributor extends CompletionContributor {
             String resolvedPath = HOME_PATTERN.matcher(rawLiteral)
                     .replaceAll(System.getProperty("user.home") + "/");
 
+
+            PsiDirectory parentDir = parameters.getOriginalFile().getParent();
+            final String currentDir = parentDir == null ? "" : parentDir.getVirtualFile().getPath();
+            resolvedPath = CURRENT_DIR_PATTERN.matcher(resolvedPath).replaceAll(currentDir + "/");
+
             FilePathMatcher.match(resolvedPath)
                     .filter(path -> !isHiddenFile(path))
                     .map(FilePathCompletionContributor::mapToString)
-                    .map(pathStr -> rawLiteral.startsWith("~/") ?
-                            pathStr.replace(System.getProperty("user.home"), "~") : pathStr)
+                    .map(pathStr -> mapToRawLiteral(pathStr, rawLiteral, currentDir))
                     .forEach(path -> result.withPrefixMatcher(rawLiteral)
                             .addElement(LookupElementBuilder.create(path)));
         }
@@ -41,6 +47,14 @@ public class FilePathCompletionContributor extends CompletionContributor {
 
     private static String mapToString(Path path) {
         return path.toString();
+    }
+
+    private static String mapToRawLiteral(String fullPath, String rawLiteral, String currentDir) {
+        String path = rawLiteral.startsWith("~/") ?
+                fullPath.replace(System.getProperty("user.home"), "~") : fullPath;
+
+        return rawLiteral.startsWith("./") ?
+                path.replace(currentDir, ".") : path;
     }
 
     private static boolean isHiddenFile(Path path) {
