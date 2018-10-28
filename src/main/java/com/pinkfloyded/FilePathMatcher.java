@@ -2,6 +2,7 @@ package com.pinkfloyded;
 
 import javax.annotation.Nonnull;
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -38,6 +39,31 @@ final class FilePathMatcher {
 
         return matches.stream().sorted();
     }
+
+
+    static Stream<String> aggregateFilePaths(String dirContainingFile, String queryString) {
+        File queryFile = new File(queryString);
+
+        if (queryFile.isAbsolute()) {
+            return match(queryString).map(Path::toString);
+        }
+
+        File relativeDirFile = new File(dirContainingFile, queryString);
+        int queryStringLastSlash = queryString.lastIndexOf(File.separatorChar);
+
+        try {
+            String canonicalPath = relativeDirFile.getCanonicalPath();
+            if (queryString.endsWith(File.separator)) {
+                canonicalPath += File.separatorChar;
+            }
+            return match(canonicalPath)
+                    .map(Path::toString)
+                    .map(s -> queryString.substring(0, queryStringLastSlash + 1) + getBaseName(s));
+        } catch (IOException e) {
+            return Stream.empty();
+        }
+    }
+
 
     static String getBaseName(String path) {
         Path pathObj = Paths.get(path);
