@@ -18,19 +18,19 @@ public class FilePathCompletionContributor extends CompletionContributor {
     public void fillCompletionVariants(@NotNull CompletionParameters parameters, @NotNull CompletionResultSet result) {
         if (isAStringLiteral(parameters.getPosition())) {
             VirtualFile parentDirectoryOfCurrentFile = parameters.getOriginalFile()
-                    .getVirtualFile()
-                    .getParent();
+                                                                 .getVirtualFile()
+                                                                 .getParent();
             String parentDirectoryOfCurrentFileStr = parentDirectoryOfCurrentFile == null ? "" :
                     parentDirectoryOfCurrentFile.getCanonicalPath();
 
             int caretPositionInString = parameters.getOffset() - parameters.getPosition().getTextOffset();
             String queryString = parameters.getPosition()
-                    .getText()
-                    .substring(1, caretPositionInString);
+                                           .getText()
+                                           .substring(1, caretPositionInString);
 
             FilePathMatcher.aggregateFilePaths(parentDirectoryOfCurrentFileStr, queryString)
-                    .forEach(path -> result.withPrefixMatcher(queryString)
-                            .addElement(LookupElementBuilder.create(path)));
+                           .forEach(path -> result.withPrefixMatcher(queryString)
+                                                  .addElement(LookupElementBuilder.create(path)));
         }
     }
 

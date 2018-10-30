@@ -43,27 +43,32 @@ final class FilePathMatcher {
 
     static Stream<String> aggregateFilePaths(String dirContainingFile, String queryString) {
         File queryFile = new File(queryString);
+        int queryStringLastSlash = queryString.lastIndexOf(File.separatorChar);
 
         if (queryFile.isAbsolute()) {
             return match(queryString).map(Path::toString);
+        } else if (queryString.startsWith("~")) {
+            return match(queryString.replaceFirst("~", System.getProperty("user.home")))
+                    .map(Path::toString)
+                    .map(s -> preserveOriginalPrefix(queryString, s, queryStringLastSlash));
         }
 
         File relativeDirFile = new File(dirContainingFile, queryString);
-        int queryStringLastSlash = queryString.lastIndexOf(File.separatorChar);
-
         try {
             String canonicalPath = relativeDirFile.getCanonicalPath();
             if (queryString.endsWith(File.separator)) {
                 canonicalPath += File.separatorChar;
             }
-            return match(canonicalPath)
-                    .map(Path::toString)
-                    .map(s -> queryString.substring(0, queryStringLastSlash + 1) + getBaseName(s));
+            return match(canonicalPath).map(Path::toString)
+                                       .map(s -> preserveOriginalPrefix(queryString, s, queryStringLastSlash));
         } catch (IOException e) {
             return Stream.empty();
         }
     }
 
+    private static String preserveOriginalPrefix(String originalQueryString, String resolvedPath, int queryStringLastSlash) {
+        return originalQueryString.substring(0, queryStringLastSlash + 1) + getBaseName(resolvedPath);
+    }
 
     static String getBaseName(String path) {
         Path pathObj = Paths.get(path);
