@@ -4,73 +4,62 @@ import com.intellij.codeInsight.completion.CompletionContributor;
 import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
-import com.intellij.psi.PsiDirectory;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
-
-import java.io.File;
-import java.nio.file.Path;
-import java.util.regex.Pattern;
 
 
 public class FilePathCompletionContributor extends CompletionContributor {
 
-    private static Pattern HOME_PATTERN = Pattern.compile("^~/");
-    private static Pattern CURRENT_DIR_PATTERN = Pattern.compile("^[.]/");
-
     @Override
     public void fillCompletionVariants(@NotNull CompletionParameters parameters, @NotNull CompletionResultSet result) {
         if (isAStringLiteral(parameters.getPosition())) {
-            int caretPositionInString = parameters.getOffset() - parameters.getPosition().getTextOffset();
+            VirtualFile parentDirectoryOfCurrentFile = parameters.getOriginalFile()
+                                                                 .getVirtualFile()
+                                                                 .getParent();
 
-            String rawLiteral = parameters.getPosition()
-                    .getText()
-                    .substring(1, caretPositionInString);
-
-
-            String resolvedPath = HOME_PATTERN.matcher(rawLiteral)
-                    .replaceAll(System.getProperty("user.home") + "/");
+            String queryString = getQueryString(parameters);
+            String parentDirectoryOfCurrentFileStr = parentDirectoryOfCurrentFile == null ? "" :
+                    parentDirectoryOfCurrentFile.getCanonicalPath();
 
 
-            PsiDirectory parentDir = parameters.getOriginalFile().getParent();
-            final String currentDir = parentDir == null ? "" : parentDir.getVirtualFile().getPath();
-            resolvedPath = CURRENT_DIR_PATTERN.matcher(resolvedPath).replaceAll(currentDir + "/");
-
-            FilePathMatcher.match(resolvedPath)
-                    .filter(path -> !isHiddenFile(path))
-                    .map(FilePathCompletionContributor::mapToString)
-                    .map(pathStr -> mapToRawLiteral(pathStr, rawLiteral, currentDir))
-                    .forEach(path -> result.withPrefixMatcher(rawLiteral)
-                            .addElement(LookupElementBuilder.create(path)));
+            FilePathMatcher.aggregateFilePaths(parentDirectoryOfCurrentFileStr, queryString)
+                           .forEach(path -> result.withPrefixMatcher(queryString)
+                                                  .addElement(LookupElementBuilder.create(path)));
         }
     }
 
-    private static String mapToString(Path path) {
-        return path.toString();
-    }
+    private static String getQueryString(CompletionParameters parameters) {
+        int caretPositionInString = parameters.getOffset() - parameters.getPosition().getTextOffset();
+        String queryString = parameters.getPosition()
+                                       .getText()
+                                       .substring(0, caretPositionInString);
 
-    private static String mapToRawLiteral(String fullPath, String rawLiteral, String currentDir) {
-        String path = rawLiteral.startsWith("~/") ?
-                fullPath.replace(System.getProperty("user.home"), "~") : fullPath;
+        if (queryString.startsWith("'") || queryString.startsWith("\"")) {
+            queryString = queryString.substring(1);
+        }
 
-        return rawLiteral.startsWith("./") ?
-                path.replace(currentDir, ".") : path;
-    }
-
-    private static boolean isHiddenFile(Path path) {
-        if (path.getFileName() == null) return false;
-
-        return path.getFileName().toString().startsWith(".");
-    }
-
-    @Override
-    public boolean invokeAutoPopup(@NotNull PsiElement position, char typeChar) {
-        return typeChar == File.separatorChar;
+        return queryString;
     }
 
     private static boolean isAStringLiteral(PsiElement element) {
         String text = element.getText();
-        return (text.startsWith("\"") && text.endsWith("\"")) || (text.startsWith("'") && text.endsWith("'"));
+        return (text.startsWith("\"") && text.endsWith("\"")) ||
+               (text.startsWith("'") && text.endsWith("'")) ||
+               getPreviousSiblingText(element).equals("\"") && getNextSiblingText(element).equals("\"") ||
+               getPreviousSiblingText(element).equals("\'") && getNextSiblingText(element).equals("\'");
+    }
+
+    private static String getPreviousSiblingText(PsiElement element) {
+        if (element.getPrevSibling() == null) return "";
+
+        return element.getPrevSibling().getText();
+    }
+
+    private static String getNextSiblingText(PsiElement element) {
+        if (element.getNextSibling() == null) return "";
+
+        return element.getNextSibling().getText();
     }
 }
 

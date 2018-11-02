@@ -11,9 +11,10 @@
     <depends>com.intellij.modules.lang</depends>
 
     <extensions defaultExtensionNs="com.intellij">
+        <typedHandler implementation="com.pinkfloyded.AutoPopupTypedHandler"/>
         <completion.contributor language="any" implementationClass="com.pinkfloyded.FilePathCompletionContributor"/>
         <completion.confidence language="any" implementationClass="com.pinkfloyded.FilePathCompletionConfidence"
-                               order="before javaSkipAutopopupInStrings"/>
+                               order="first"/>
     </extensions>
 
     <actions>

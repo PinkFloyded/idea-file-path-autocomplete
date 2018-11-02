@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'com.pinkfloyded.idea-file-path-autocomplete'
-version '0.2.0'
+version '0.3.0'
 
 sourceCompatibility = 1.8
 
@@ -15,14 +15,21 @@ repositories {
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     testCompile 'com.google.guava:guava:26.0-jre'
+    testCompile group: 'commons-io', name: 'commons-io', version: '2.6'
 }
 
 intellij {
-    version '2018.1.5'
+    version '2018.2.4'
     updateSinceUntilBuild false
 }
 patchPluginXml {
     changeNotes """
-1. Add support for `./` and `../`
+1. Fix bugs related to `.` and `..`
+
+2. Add support for relative paths within the current directory without `./`
+
+3. Fix auto invoke not working for few languages
+
+4. Fix PHP support 
     """
 }
