@@ -43,12 +43,17 @@ final class FilePathMatcher {
 
     static Stream<String> aggregateFilePaths(String dirContainingFile, String queryString) {
         File queryFile = new File(queryString);
-        int queryStringLastSlash = queryString.lastIndexOf(File.separatorChar);
+        int queryStringLastSlash = getLastIndexOfSeparator(queryString);
 
         if (queryFile.isAbsolute()) {
             return match(queryString).map(Path::toString);
         } else if (queryString.startsWith("~")) {
-            return match(queryString.replaceFirst("~", System.getProperty("user.home")))
+            String canonicalPath = new File(System.getProperty("user.home") + queryString.substring(1)).getPath();
+            if (queryString.endsWith(File.separator) || queryString.endsWith("/")) {
+                canonicalPath += File.separatorChar;
+            }
+
+            return match(canonicalPath)
                     .map(Path::toString)
                     .map(s -> preserveOriginalPrefix(queryString, s, queryStringLastSlash));
         }
@@ -56,7 +61,7 @@ final class FilePathMatcher {
         File relativeDirFile = new File(dirContainingFile, queryString);
         try {
             String canonicalPath = relativeDirFile.getCanonicalPath();
-            if (queryString.endsWith(File.separator)) {
+            if (queryString.endsWith(File.separator) || queryString.endsWith("/")) {
                 canonicalPath += File.separatorChar;
             }
             return match(canonicalPath).map(Path::toString)
@@ -64,6 +69,15 @@ final class FilePathMatcher {
         } catch (IOException e) {
             return Stream.empty();
         }
+    }
+
+    private static int getLastIndexOfSeparator(String path) {
+        int queryStringLastSlash = path.lastIndexOf(File.separatorChar);
+
+        if (queryStringLastSlash != -1) return queryStringLastSlash;
+
+        // Java also allows '/' in all OSes
+        return path.lastIndexOf('/');
     }
 
     private static String preserveOriginalPrefix(String originalQueryString, String resolvedPath, int queryStringLastSlash) {
