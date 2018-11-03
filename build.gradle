@@ -22,14 +22,3 @@ intellij {
     version '2018.2.4'
     updateSinceUntilBuild false
 }
-patchPluginXml {
-    changeNotes """
-1. Fix bugs related to `.` and `..`
-
-2. Add support for relative paths within the current directory without `./`
-
-3. Fix auto invoke not working for few languages
-
-4. Fix PHP support 
-    """
-}

@@ -7,6 +7,15 @@
     <p>Auto-completes file paths.</p>
     ]]></description>
 
+    <change-notes><![CDATA[
+<ul>
+    <li>Fix bugs related to `.` and `..`</li>
+    <li>Add support for relative paths within the current directory without `./`</li>
+    <li>Fix auto invoke not working for few languages</li>
+    <li>Fix PHP support</li>
+</ul>
+    ]]>
+    </change-notes>
     <idea-version since-build="143"/>
     <depends>com.intellij.modules.lang</depends>
 
