@@ -13,20 +13,18 @@ public class FilePathCompletionContributor extends CompletionContributor {
 
     @Override
     public void fillCompletionVariants(@NotNull CompletionParameters parameters, @NotNull CompletionResultSet result) {
-        if (isAStringLiteral(parameters.getPosition())) {
-            VirtualFile parentDirectoryOfCurrentFile = parameters.getOriginalFile()
-                                                                 .getVirtualFile()
-                                                                 .getParent();
+        VirtualFile parentDirectoryOfCurrentFile = parameters.getOriginalFile()
+                .getVirtualFile()
+                .getParent();
 
-            String queryString = getQueryString(parameters);
-            String parentDirectoryOfCurrentFileStr = parentDirectoryOfCurrentFile == null ? "" :
-                    parentDirectoryOfCurrentFile.getCanonicalPath();
+        String queryString = getQueryString(parameters);
+        String parentDirectoryOfCurrentFileStr = parentDirectoryOfCurrentFile == null ? "" :
+                parentDirectoryOfCurrentFile.getCanonicalPath();
 
 
-            FilePathMatcher.aggregateFilePaths(parentDirectoryOfCurrentFileStr, queryString)
-                           .forEach(path -> result.withPrefixMatcher(queryString)
-                                                  .addElement(LookupElementBuilder.create(path)));
-        }
+        FilePathMatcher.aggregateFilePaths(parentDirectoryOfCurrentFileStr, queryString)
+                .forEach(path -> result.withPrefixMatcher(queryString)
+                        .addElement(LookupElementBuilder.create(path)));
     }
 
     private static String getQueryString(CompletionParameters parameters) {

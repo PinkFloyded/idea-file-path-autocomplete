@@ -3,6 +3,7 @@ package com.pinkfloyded;
 import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -85,7 +86,11 @@ final class FilePathMatcher {
     }
 
     static String getBaseName(String path) {
-        Path pathObj = Paths.get(path);
-        return pathObj.getFileName() == null ? "" : pathObj.getFileName().toString();
+        try{
+            Path pathObj = Paths.get(path);
+            return pathObj.getFileName() == null ? "" : pathObj.getFileName().toString();
+        } catch (InvalidPathException e) {
+            return "";
+        }
     }
 }
