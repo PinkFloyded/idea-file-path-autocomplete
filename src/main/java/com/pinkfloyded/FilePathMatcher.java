@@ -17,7 +17,7 @@ final class FilePathMatcher {
         List<Path> matches = new ArrayList<>();
 
         File file = new File(str);
-        if (str.endsWith(File.separator)) {
+        if (str.endsWith(File.separator) || str.endsWith("/")) {
             File[] filesInDir = file.listFiles();
             if (filesInDir != null) {
                 for (File f : filesInDir) {
@@ -47,7 +47,7 @@ final class FilePathMatcher {
         int queryStringLastSlash = getLastIndexOfSeparator(queryString);
 
         if (queryFile.isAbsolute()) {
-            return match(queryString).map(Path::toString);
+            return match(queryString).map(Path::toString).map(s -> preserveOriginalPrefix(queryString, s, queryStringLastSlash));
         } else if (queryString.startsWith("~")) {
             String canonicalPath = new File(System.getProperty("user.home") + queryString.substring(1)).getPath();
             if (queryString.endsWith(File.separator) || queryString.endsWith("/")) {
@@ -73,12 +73,10 @@ final class FilePathMatcher {
     }
 
     private static int getLastIndexOfSeparator(String path) {
-        int queryStringLastSlash = path.lastIndexOf(File.separatorChar);
+        int separatorIndex = path.lastIndexOf(File.separatorChar);
+        int forwardSlashIndex = path.lastIndexOf("/");
 
-        if (queryStringLastSlash != -1) return queryStringLastSlash;
-
-        // Java also allows '/' in all OSes
-        return path.lastIndexOf('/');
+        return Math.max(separatorIndex, forwardSlashIndex);
     }
 
     private static String preserveOriginalPrefix(String originalQueryString, String resolvedPath, int queryStringLastSlash) {

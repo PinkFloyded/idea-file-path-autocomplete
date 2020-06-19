@@ -13,7 +13,7 @@ public class AutoPopupTypedHandler extends TypedHandlerDelegate {
     @NotNull
     @Override
     public Result checkAutoPopup(char charTyped, @NotNull Project project, @NotNull Editor editor, @NotNull PsiFile file) {
-        if (charTyped == File.separatorChar) {
+        if (charTyped == File.separatorChar || charTyped == '/') {
             AutoPopupController.getInstance(project).scheduleAutoPopup(editor);
             return Result.STOP;
         }

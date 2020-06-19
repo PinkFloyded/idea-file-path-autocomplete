@@ -9,10 +9,7 @@
 
     <change-notes><![CDATA[
 <ul>
-    <li>Fix bugs related to `.` and `..`</li>
-    <li>Add support for relative paths within the current directory without `./`</li>
-    <li>Fix auto invoke not working for few languages</li>
-    <li>Fix PHP support</li>
+    <li>Allow `/` on all platforms in paths</li>
 </ul>
     ]]>
     </change-notes>
